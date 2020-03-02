@@ -96,7 +96,7 @@ class GifSearch:
             return 0
 
     def set_pos(self, search_request:str, search_position:int):
-        search_request.lower()
+        search_request = search_request.lower()
         self._word_request[search_request] = search_position
 
     def search_gif_tenor(self, limit:int, search_request:str):
@@ -108,6 +108,7 @@ class GifSearch:
         '''
         from requests import get
         import json
+        search_request = search_request.lower()
         search_pos = self.request_pos(search_request) #последний адрес поиска
         search_result = [None] * limit
 
