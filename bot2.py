@@ -63,18 +63,19 @@ def text_answers(message):
 
 #поиск гифок по запросу (до 9шт
 gifsearch = GifSearch(123) #создать общий класс (пока что) FIXME
-@bot.message_handler(regexp=r'^(?i)gif (\d) (\w+) ?(\w*)$')  # gif <1_digit> <word> <word_optional>
+@bot.message_handler(regexp=r'^(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$')  # gif <1_digit> <word> <word_optional>
 def send_gif(message):
-    pattern = r'(?i)gif (\d) (\w+) ?(\w*)$'
+    pattern = r'^(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$'
     search = re.match(pattern, message.text)
     count = int(search.group(1))
     if count <= 0:
         return
     word = str(search.group(2))
     word += str(search.group(3))
+    word += str(search.group(4))
     gifs = searchgif(GIFAPI, 0, word, count)
     gifs = gifsearch.search_gif_tenor(count, word)
-    print (gifs)
+    # print (gifs)
     if gifs == None:
         bot.send_message(message.chat.id, '"{}"\n Is not found. Sorry...'.format(word))
     else:

@@ -125,7 +125,7 @@ class GifSearch:
         self.set_pos(search_request, int(gif['next'])) #обновление последнего адреса поиска
         if None in search_result:
             self.set_pos(search_request, 0)
-        elif search_result[0] == None:
+        if search_result[0] == None:
             search_result = None
             self.set_pos(search_request, 0)
         return search_result
