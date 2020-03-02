@@ -67,12 +67,17 @@ gifsearch = GifSearch(123) #создать общий класс (пока чт�
 def send_gif(message):
     pattern = r'^(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$'
     search = re.match(pattern, message.text)
+    wordlist = []
+    word = str(search.group(2))
     count = int(search.group(1))
     if count <= 0:
         return
-    word = str(search.group(2))
-    word += str(search.group(3))
-    word += str(search.group(4))
+    wordlist = [str(search.group(3)), str(search.group(4))]
+    for pos in wordlist:
+        if pos: word += ' ' + pos
+    # word = str(search.group(2))
+    # word += ' ' + str(search.group(3))
+    # word += ' ' + str(search.group(4))
     gifs = searchgif(GIFAPI, 0, word, count)
     gifs = gifsearch.search_gif_tenor(count, word)
     # print (gifs)

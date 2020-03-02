@@ -78,6 +78,7 @@ class GifSearch:
         '''
         self._word_request = {}
         self.chatid = chatid
+        self.content_filter = ['off', 'low', 'medium', 'high']
 
     @property
     def name(self):
@@ -114,8 +115,8 @@ class GifSearch:
 
         try:
             search = get(
-                "https://api.tenor.com/v1/search?q=%s&key=%s&media_filter=minimal&limit=%s&pos=%s" \
-                % (search_request, GifSearch.GIFAPI_TENOR, limit, search_pos))
+                "https://api.tenor.com/v1/search?q=%s&key=%s&contentfilter=%s&media_filter=minimal&limit=%s&pos=%s" \
+                % (search_request, GifSearch.GIFAPI_TENOR, self.content_filter[0], limit, search_pos))
             gif = dict(json.loads(search.content.decode('utf-8')))
         except:
             print('something wrong with request')
