@@ -41,9 +41,32 @@ def on_user_joins(message):
         bot.send_message(message.chat.id, 'Soon.')
 
 
-@bot.message_handler(content_types = ['reply_to_message'])
+@bot.message_handler(commands=['test'])
 def reply_to_message(message):
-    bot.reply_to(message, 'Шо ты от мены хочешь?')
+    msg = bot.reply_to(message, 'Шо ты от мены хочешь?')
+    bot.register_for_reply(msg, lambda mess: bot.reply_to(mess, 'Мне пофиг')) #TODO довести до ума
+
+@bot.message_handler(commands=['stickerid'])
+def ask_sticker_reply(message):
+    msg = bot.reply_to(message, 'reply this message with sticker')
+    bot.register_for_reply(msg, get_sticker_id)
+
+def get_sticker_id(message):
+    # message_id = message.message_id
+    # chat_id = message.chat.id
+    if message.content_type == 'sticker':
+        sticker_obj = message.sticker
+        sticker_id = getattr(sticker_obj, 'file_id')
+        set_name = message.sticker.set_name
+        emoji = message.sticker.emoji
+        file_size = message.sticker.file_size
+        # print ('sticker id:\n', sticker_id)
+        # print (type (sticker_id))
+        bot.reply_to(message, 'Sticker set name: {}\nEmoji: {}\nFile size: {}\nStickerID:\n{}\n ' .format\
+            (set_name, emoji, file_size, sticker_id))
+    else: ask_sticker_reply(message)
+
+
 
 # echo
 @bot.message_handler(regexp=r'(?i)echo (.*)')  # потом упростить
@@ -75,9 +98,6 @@ def send_gif(message):
     wordlist = [str(search.group(3)), str(search.group(4))]
     for pos in wordlist:
         if pos: word += ' ' + pos
-    # word = str(search.group(2))
-    # word += ' ' + str(search.group(3))
-    # word += ' ' + str(search.group(4))
     gifs = searchgif(GIFAPI, 0, word, count)
     gifs = gifsearch.search_gif_tenor(count, word)
     # print (gifs)
@@ -118,16 +138,6 @@ def text_answers(message):
     if message.text == 'msginfo':
         bot.reply_to(message, 'you name: \n\
 {} {}\nYou ID: {}'.format(message.from_user.first_name, message.from_user.last_name, message.from_user.id))
-    # #КЛОВИОТУРКА
-    # elif message.text == 'button':
-    #     keyboard = types.InlineKeyboardMarkup();
-    #     # keyboard = types.InlineKeyboardMarkup();  # наша клавиатура
-    #     key_yes = types.InlineKeyboardButton(text='Да', callback_data='yes');  # кнопка «Да»
-    #     keyboard.add(key_yes);  # добавляем кнопку в клавиатуру
-    #     key_no = types.InlineKeyboardButton(text='Нет', callback_data='no');
-    #     keyboard.add(key_no);
-    #     question = 'Псс. Хочешь немного дельфинов?';
-    #     bot.send_message(message.chat.id, text=question, reply_markup=keyboard)
 
 #реакция на клавиатуру
 @bot.callback_query_handler(func=lambda call: True)
