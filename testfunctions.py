@@ -1,4 +1,5 @@
-
+import json #for Datasaver
+import os #for Datasaver
 
 GIFAPI = 'JJYG01W4CPTP'
 lmtgif = 3
@@ -14,13 +15,13 @@ class Chat:
 #перенести класс для поиска гифок в прод
 class GifSearch:
     GIFAPI_TENOR = str #задать ключ АПИ
-    def __init__(self, chatid:str):
+    def __init__(self, words_requests:dict):
         '''
         :param name: Название чата в котором был запрос
         :param word_request: Словарь запросов в чате:номер поиска
         '''
-        self._word_request = {}
-        self.chatid = chatid
+        assert type(words_requests) == dict
+        self._word_request = words_requests
 
     @property
     def name(self):
@@ -124,6 +125,30 @@ class BotUser:
                 self.dict_of_users[id][key] = var
 
 #Написать метод группировки словарей для сохранения
+class Datasaver:
+    def __init__(self, filename, **kwargs):
+        self.group_dict = kwargs
+        self.file_name = filename
+
+    def save_data(self):
+        with open(self.file_name, 'w') as file:
+            json.dump(self.group_dict, file)
+        return True
+
+    def load_data(self):
+        if os.path.isfile(self.file_name):
+            with open(self.file_name, 'r') as file:
+                self.group_dict = json.load(file)
+            return True
+        else:
+            return False
+    def append_dict(self, dictionary:dict):
+        self.group_dict.update(dictionary)
+
+
+
+
+
 #Написать метод распаковки словарей из словаря
 
 #сделать список чятов бота
@@ -142,17 +167,30 @@ myid = 161613125
 notmyid = 161613126
 notmyiddict = {'first_name':'Vasya', 'last_name':'B.',
                         'steps':5, 'is_bot':True}
-users = BotUser(user_dict)
-users.initialise(myid, **notmyiddict) #добавить пользователя
 
+req_dict = {'dolphin':1, 'pony':2}
+gifs = GifSearch(req_dict)
+print (gifs.search_gif_tenor(2,'horse'))
 
-print (f'known user {myid} is {users.known(myid)}')
-print (users.dict_of_users)
-print ('params = {}'.format(users.get_params(myid, 'first_name', 'last_name')))
+dict2 = {'abc':342, 'dasf':'ddddeeet', 3424:'jjjeeeej'}
 
-users.set_params(myid, first_name='aaaa')
+dict_list = [req_dict, dict2]
 
-# user1 = BotUser(161613125)
-# user1.initialise(-346674731, first_name='Dima', last_name='K.', is_bot=False, username='dimaaannn')
-# print (f'userID = {user1.id}\nName = {user1.first_name}, {user1.last_name}')
+save = Datasaver('word_dict.txt', req_dict=req_dict, dict2=dict2)
 
+print ('save data is ' , save.save_data())
+gifs.search_gif_tenor(2,'test')
+print ('not saved dict = ', req_dict)
+print (save.load_data())
+req_dict = save.group_dict.get('req_dict')
+print ('neq req_dict = ', req_dict)
+
+# file = open('word_dict.txt', 'w')
+# json.dump(dict_list, file)
+# file.close()
+
+# with open('word_dict.txt', 'r') as file:
+#     dict_list = json.load(file)
+# dict1 = dict_list[0]
+# dict2 = dict_list[1]
+# print(dict1, dict2)
