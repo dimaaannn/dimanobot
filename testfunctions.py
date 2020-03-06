@@ -126,9 +126,12 @@ class BotUser:
 
 #Написать метод группировки словарей для сохранения
 class Datasaver:
-    def __init__(self, filename, **kwargs):
-        self.group_dict = kwargs
+    def __init__(self, filename, *args):
         self.file_name = filename
+        self.group_dict = {}
+        self.temp_dict = {}
+        for i, k in enumerate(args):
+            self.group_dict[i] = k
 
     def save_data(self):
         with open(self.file_name, 'w') as file:
@@ -138,12 +141,16 @@ class Datasaver:
     def load_data(self):
         if os.path.isfile(self.file_name):
             with open(self.file_name, 'r') as file:
-                self.group_dict = json.load(file)
+                self.temp_dict = json.load(file)
+                for key in self.group_dict:
+                    temp = self.group_dict[key]
+                    temp = self.temp_dict.get(key)
             return True
         else:
             return False
-    def append_dict(self, dictionary:dict):
-        self.group_dict.update(dictionary)
+    def add_to_save(self, *args):
+        for i, k in enumerate(args, len(self.group_dict)):
+            self.group_dict[i] = k
 
 
 
@@ -170,20 +177,11 @@ notmyiddict = {'first_name':'Vasya', 'last_name':'B.',
 
 req_dict = {'dolphin':1, 'pony':2}
 gifs = GifSearch(req_dict)
-print (gifs.search_gif_tenor(2,'horse'))
+print (gifs.search_gif_tenor(2,'mule'))
 
 dict2 = {'abc':342, 'dasf':'ddddeeet', 3424:'jjjeeeej'}
 
-dict_list = [req_dict, dict2]
-
-save = Datasaver('word_dict.txt', req_dict=req_dict, dict2=dict2)
-
-print ('save data is ' , save.save_data())
-gifs.search_gif_tenor(2,'test')
-print ('not saved dict = ', req_dict)
-print (save.load_data())
-req_dict = save.group_dict.get('req_dict')
-print ('neq req_dict = ', req_dict)
+dict_list = {'a':req_dict, 'b':dict2}
 
 # file = open('word_dict.txt', 'w')
 # json.dump(dict_list, file)

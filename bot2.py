@@ -12,6 +12,8 @@ user_dict = {}
 
 temp_data = []
 temp_messages = {}
+gif_search_dict = {} #словарь запросов гифок
+
 # commands
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -85,7 +87,7 @@ def text_answers(message):
 
 
 #поиск гифок по запросу (до 9шт
-gifsearch = GifSearch(123) #создать общий класс (пока что) FIXME
+gifsearch = GifSearch(gif_search_dict) #создать общий класс (пока что) FIXME
 @bot.message_handler(regexp=r'^(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$')  # gif <1_digit> <word> <word_optional>
 def send_gif(message):
     pattern = r'^(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$'

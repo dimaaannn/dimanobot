@@ -2,7 +2,8 @@ import telebot
 import time
 from telebot import types
 from bottoken import *
-
+from requests import get #for GifSearch
+import json              #for GifSearch
 #основная функция бота!
 bot = telebot.TeleBot(BOTTOKEN)
 # bot.set_update_listener(listener) #регистрация вывода в консоль
@@ -71,13 +72,12 @@ def listener(messages):
 
 class GifSearch:
     GIFAPI_TENOR = str #задать ключ АПИ
-    def __init__(self, chatid:str):
+    def __init__(self, gif_search_dict:dict):
         '''
         :param name: Название чата в котором был запрос
         :param word_request: Словарь запросов в чате:номер поиска
         '''
-        self._word_request = {}
-        self.chatid = chatid
+        self._word_request = gif_search_dict
         self.content_filter = ['off', 'low', 'medium', 'high']
 
     @property
@@ -107,8 +107,6 @@ class GifSearch:
         :param search_request: Запрос
         :return: Список ссылок
         '''
-        from requests import get
-        import json
         search_request = search_request.lower()
         search_pos = self.request_pos(search_request) #последний адрес поиска
         search_result = [None] * limit
@@ -134,6 +132,42 @@ class GifSearch:
 
 GifSearch.GIFAPI_TENOR = GIFAPI #инициализация АПИ
 
+class DataSaver:
+    """
+    Сохраняет словари или списки в файлы внутри папки
+    :param foldername: имя папки
+    :param kwargs: dictname=dictionary
+    """
+
+    def __init__(self, foldername: str, **kwargs):
+        self.dict_list = kwargs
+        self.save_folder = foldername
+
+    def save(self):
+        """
+        сохраняет в файлы все переданные ранее словари
+        :return: True
+        """
+        for k, link in self.dict_list.items():
+            with open(r'%s\%s.json' % (self.save_folder, k), 'w') as filename:
+                json.dump(link, filename)
+        return True
+
+    def load(self):
+        """
+        Загружает из файлов всю информацию
+        :return: True
+        """
+        for k, link in self.dict_list.items():
+            with open(r'%s\%s.json' % (self.save_folder, k), 'r') as filename:
+                if type(link) == dict:
+                    link.update(json.load(filename))
+                elif type(link) == list:
+                    link.insert(0, json.load(filename))
+                else:
+                    print('item must be list or dict, your type {}'.format(type(link)))
+                    continue
+        return True
 
 #тестирование
 word = 'chrysalys'
