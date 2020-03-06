@@ -5,14 +5,15 @@ from bottoken import *
 import re
 from bot_func import *
 
-# bot = telebot.TeleBot(BOTTOKEN)
+
 bot.set_update_listener(listener) #регистрация вывода в консоль
-
-user_dict = {}
-
-temp_data = []
-temp_messages = {}
 gif_search_dict = {} #словарь запросов гифок
+gifsearch = GifSearch(gif_search_dict) #имя экземпляра для поиска гифок
+GifSearch.GIFAPI_TENOR = GIFAPI #нужно для класса гифок
+gif_2_hdd = DataSaver('botdata', gif_search_dict=gif_search_dict)
+print ('gif dictionary loaded is {}'.format(gif_2_hdd.load()))
+
+temp_messages = {} #ID messages for deleting
 
 # commands
 @bot.message_handler(commands=['start', 'help'])
@@ -87,10 +88,10 @@ def text_answers(message):
 
 
 #поиск гифок по запросу (до 9шт
-gifsearch = GifSearch(gif_search_dict) #создать общий класс (пока что) FIXME
+# gifsearch = GifSearch(gif_search_dict) #создать общий класс (пока что)
 @bot.message_handler(regexp=r'^(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$')  # gif <1_digit> <word> <word_optional>
 def send_gif(message):
-    pattern = r'^(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$'
+    pattern = r'(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$'
     search = re.match(pattern, message.text)
     wordlist = []
     word = str(search.group(2))
@@ -100,7 +101,6 @@ def send_gif(message):
     wordlist = [str(search.group(3)), str(search.group(4))]
     for pos in wordlist:
         if pos: word += ' ' + pos
-    gifs = searchgif(GIFAPI, 0, word, count)
     gifs = gifsearch.search_gif_tenor(count, word)
     # print (gifs)
     if gifs == None:
@@ -108,6 +108,7 @@ def send_gif(message):
     else:
         for gif in gifs:
             bot.send_animation(message.chat.id, gif)
+    gif_2_hdd.save() #сохранить результат на HDD
 
 # Если lambda возвращает True - запускается функция
 @bot.message_handler(func=lambda m: m.text == 'hello')
@@ -141,12 +142,13 @@ def text_answers(message):
         bot.reply_to(message, 'you name: \n\
 {} {}\nYou ID: {}'.format(message.from_user.first_name, message.from_user.last_name, message.from_user.id))
 
-#реакция на клавиатуру
+#реакция на вызов дельфиноспама
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
     if call.data == "yes": #call.data это callback_data, которую мы указали при объявлении кнопки
         # bot.send_message(call.message.chat.id, 'Не сейчас. )')
-        dolphinospam(call.message.chat.id)
+        dolphinospam(gifsearch.search_gif_tenor, call.message.chat.id)
+        gifsearch.search_gif_tenor(3,'str')
         try:
             bot.delete_message(call.message.chat.id, temp_messages[call.message.chat.id].pop(0))
         except: print ('del exception')

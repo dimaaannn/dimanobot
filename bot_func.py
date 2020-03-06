@@ -8,53 +8,12 @@ import json              #for GifSearch
 bot = telebot.TeleBot(BOTTOKEN)
 # bot.set_update_listener(listener) #регистрация вывода в консоль
 
-searchdict = {}
 
-#декоратор для цикла позиции поиска гифок
-def cyclesearch(sgif):
-
-    searchpos = 0
-
-    def wrapper(gifapikey, searchposition: int, word: str = 'dolphin', limit=1):
-        # nonlocal searchpos
-        global searchdict                          #  УБРАТЬ КОСТЫЛЬ!!!
-        if word not in searchdict:
-            searchdict[word] = 0
-        elif searchdict[word] >= 30:
-            searchdict[word] = 0
-        else: searchdict[word] += limit
-        # if searchpos >= 50:
-        #     searchpos = 0
-        # else:
-        #     searchpos += limit
-        return sgif(gifapikey, searchdict[word], word, limit)
-
-    return wrapper
-
-#поиск гифок
-@cyclesearch
-def searchgif(gifapikey, searchposition: int, word: str = 'dolphin', limit=1):
-    '''возвращает список ссылок найденных гифок по запросу 'word'
-    в количестве 'limit' штук начиная с результата с номером 'searchposition' '''
-    from requests import get
-    import json
-    try:
-        search = get(
-            "https://api.tenor.com/v1/search?q=%s&key=%s&media_filter=minimal&limit=%s&pos=%s" \
-            % (word, gifapikey, limit, searchposition))
-        gif = dict(json.loads(search.content.decode('utf-8')))
-    except:
-        print ('something wrong with request')
-    # print (gif)
-    listlink = []
-    for result in gif['results']:
-        listlink.append(result['url'])
-    return listlink
-
-def dolphinospam(chatid):
+def dolphinospam(gifsearch, chatid):
     count = 3
     word = 'dolphin'
-    gifs = searchgif(GIFAPI, 0, word, count)
+    gifs = gifsearch(count, word)
+    # gifs = searchgif(GIFAPI, 0, word, count)
     for gif in gifs:
         bot.send_animation(chatid, gif)
 
@@ -148,26 +107,48 @@ class DataSaver:
         сохраняет в файлы все переданные ранее словари
         :return: True
         """
-        for k, link in self.dict_list.items():
-            with open(r'%s\%s.json' % (self.save_folder, k), 'w') as filename:
-                json.dump(link, filename)
-        return True
+        from os.path import isdir
+        from os import mkdir
+        success_list = {}
+
+        if not isdir(self.save_folder):  # создать папку если её нет
+            try:
+                mkdir(self.save_folder)
+            except OSError:
+                print("Creation of the directory %s failed" % self.save_folder)
+        for k, link in self.dict_list.items():  # создаём файлы словарей
+            if type(link) == dict or list:
+                with open(r'%s\%s.json' % (self.save_folder, k), 'w') as filename:
+                    json.dump(link, filename)
+                    success_list[k] = True  # удачная запись файла
+            else:
+                success_list[k] = False  # если не удалось записать
+                continue
+        return success_list
 
     def load(self):
         """
         Загружает из файлов всю информацию
         :return: True
         """
+        checklist = {}
         for k, link in self.dict_list.items():
-            with open(r'%s\%s.json' % (self.save_folder, k), 'r') as filename:
-                if type(link) == dict:
-                    link.update(json.load(filename))
-                elif type(link) == list:
-                    link.insert(0, json.load(filename))
-                else:
-                    print('item must be list or dict, your type {}'.format(type(link)))
-                    continue
-        return True
+            try:
+                with open(r'%s\%s.json' % (self.save_folder, k), 'r') as filename:
+                    if type(link) == dict:
+                        link.update(json.load(filename))
+                        checklist[k] = True
+                    elif type(link) == list:
+                        link.insert(0, json.load(filename))
+                        checklist[k] = True
+                    else:
+                        print('item must be list or dict, your type {}'.format(type(link)))
+                        checklist[k] = None
+                        continue
+            except FileNotFoundError:
+                checklist[k] = False
+                continue
+        return checklist
 
 #тестирование
 word = 'chrysalys'
