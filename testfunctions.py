@@ -1,7 +1,7 @@
 import json #for Datasaver
 import os #for Datasaver
+from bottoken import GIFAPI
 
-GIFAPI = 'JJYG01W4CPTP'
 lmtgif = 3
 search_term = "dolphin"
 media_filter = 'minimal'
