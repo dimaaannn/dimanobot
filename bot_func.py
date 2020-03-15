@@ -26,7 +26,7 @@ def listener(messages):
         if m.content_type == 'text':
             # print the sent message to the console
             print(str(m.from_user.first_name) + " " + \
-                  str(m.from_user.last_name) + "ID - " + str(m.from_user.id) +\
+                  str(m.from_user.last_name) + "ID - " + str(m.from_user.id) + \
                   " \n[" + str(m.chat.id) + "]: " + m.text)
 
 class GifSearch:

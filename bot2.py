@@ -44,7 +44,7 @@ def on_user_joins(message):
         bot.send_message(message.chat.id, 'Soon.')
 
 
-@bot.message_handler(commands=['test'])
+@bot.message_handler(commands=['reply'])
 def reply_to_message(message):
     msg = bot.reply_to(message, 'Шо ты от мены хочешь?')
     bot.register_for_reply(msg, lambda mess: bot.reply_to(mess, 'Мне пофиг')) #TODO довести до ума
@@ -57,6 +57,7 @@ def ask_sticker_reply(message):
 def get_sticker_id(message):
     # message_id = message.message_id
     # chat_id = message.chat.id
+    print(message.reply_to_message)
     if message.content_type == 'sticker':
         sticker_obj = message.sticker
         sticker_id = getattr(sticker_obj, 'file_id')
@@ -69,7 +70,15 @@ def get_sticker_id(message):
             (set_name, emoji, file_size, sticker_id))
     else: ask_sticker_reply(message)
 
+@bot.message_handler(commands=['test'])
+def ask_sticker_reply(message):
+    temp = message.reply_to_message.from_user.id
+    print('reply :', temp)
 
+# ОТВЕТ НА ВСЕ ТЫЧКИ
+@bot.message_handler(func= lambda message: message.reply_to_message.from_user.id == 893733592)
+def bot_reply(message):
+    bot.reply_to(message, 'Ты чё, докопаться решил?!!')
 
 # echo
 @bot.message_handler(regexp=r'(?i)echo (.*)')  # потом упростить
