@@ -20,6 +20,13 @@ class SqlData:
         '''
         Connect to DB
         '''
+        check = False
+        try:
+            if bool(not self.connection.closed):
+                print ('connection active')
+                return 'connection active'
+        except:
+            print('open connection')
         self.connection = psycopg2.connect(**self.__connect_data)
         return self.connection
 
