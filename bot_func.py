@@ -4,9 +4,48 @@ from telebot import types
 from bottoken import *
 from requests import get #for GifSearch
 import json              #for GifSearch
+# from testfunctions import SqlData
+import psycopg2
+
 #основная функция бота!
 bot = telebot.TeleBot(BOTTOKEN)
 # bot.set_update_listener(listener) #регистрация вывода в консоль
+
+class SqlData:
+    def __init__(self, **kwargs):
+        self.__connect_data = kwargs
+        self.connection = None
+
+    def db_connect(self):
+        '''
+        Connect to DB
+        '''
+        self.connection = psycopg2.connect(**self.__connect_data)
+        return self.connection
+
+    def db_disconnect(self):
+        '''
+        Disconnect with DB
+        '''
+        if not self.connection.closed:
+            return
+        self.connection.close()
+        return bool(self.connection.closed)
+
+    def message_logger(self, message):
+        with self.connection.cursor() as cursor1:
+            reply_to = 0
+            try:
+                reply_to = message.reply_to_message.message_id
+            except AttributeError:
+                pass
+            cursor1.execute('''
+            INSERT INTO botdata.messages (chat_id, user_id, message_id, time_stamp, text, reply_to) 
+            VALUES (%s, %s, %s, (TIMESTAMPTZ 'epoch' + %s * '1 second'::interval), %s, %s) 
+            ''', (str(message.chat.id), str(message.from_user.id), str(message.message_id), str(message.date),\
+                  str(message.text), str(reply_to)))
+            self.connection.commit()
+        return cursor1.statusmessage
 
 
 def dolphinospam(gifsearch, chatid):
@@ -17,17 +56,25 @@ def dolphinospam(gifsearch, chatid):
     for gif in gifs:
         bot.send_animation(chatid, gif)
 
+botdata = SqlData(dbname=postgresql_bd, user=postgresql_username,
+                        password=postgresql_password, host=postgresql_host)
 #вывод сообщений в консоль
 def listener(messages):
     """
     When new messages arrive TeleBot will call this function.
     """
+    botdata.db_connect()
+    for message in messages:
+        botdata.message_logger(message)
     for m in messages:
         if m.content_type == 'text':
             # print the sent message to the console
             print(str(m.from_user.first_name) + " " + \
                   str(m.from_user.last_name) + "ID - " + str(m.from_user.id) + \
                   " \n[" + str(m.chat.id) + "]: " + m.text)
+
+
+
 
 class GifSearch:
     GIFAPI_TENOR = str #задать ключ АПИ
@@ -157,3 +204,5 @@ if __name__ == "__main__":
     giff.set_pos(word, 4)
     result = giff.search_gif_tenor(5,word)
     print (result)
+
+

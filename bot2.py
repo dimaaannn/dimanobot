@@ -71,14 +71,19 @@ def get_sticker_id(message):
     else: ask_sticker_reply(message)
 
 @bot.message_handler(commands=['test'])
-def ask_sticker_reply(message):
-    temp = message.reply_to_message.from_user.id
+def test_reply(message):
+    reply = None
+    if message.reply_to_message:
+        reply = message.reply_to_message.message_id
+    temp = list ([message.chat.id, message.from_user.id, message.message_id, message.date,\
+                  message.text, reply])
     print('reply :', temp)
 
-# ОТВЕТ НА ВСЕ ТЫЧКИ
-@bot.message_handler(func= lambda message: message.reply_to_message.from_user.id == 893733592)
+# ОТВЕТ НА ВСЕ ТЫЧКИ текстом
+@bot.message_handler(func= lambda message: not message.reply_to_message == None and message.reply_to_message.from_user.id == bot_id)
 def bot_reply(message):
-    bot.reply_to(message, 'Ты чё, докопаться решил?!!')
+    print(message)
+    bot.reply_to(message, 'Ты докопаться решил?!!')
 
 # echo
 @bot.message_handler(regexp=r'(?i)echo (.*)')  # потом упростить
@@ -113,7 +118,7 @@ def send_gif(message):
     gifs = gifsearch.search_gif_tenor(count, word)
     # print (gifs)
     if gifs == None:
-        bot.send_message(message.chat.id, '"{}"\n Is not found. Sorry...'.format(word))
+        bot.send_message(message.message_id, '"{}"\n Is not found. Sorry...'.format(word))
     else:
         for gif in gifs:
             bot.send_animation(message.chat.id, gif)

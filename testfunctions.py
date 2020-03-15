@@ -1,6 +1,7 @@
 import json #for Datasaver
 import os #for Datasaver
-from bottoken import GIFAPI
+from bottoken import *
+import psycopg2
 
 #Написать класс пользователя
 class BotUser:
@@ -49,12 +50,44 @@ class BotUser:
                 self.dict_of_users[id][key] = var
 
 
-#сделать список чятов бота
-class Chats:
-    chat_list = []
-    def __init__(self):
-        self.chat_name = None
-        self.chat_users = []
+class SqlData:
+    def __init__(self, **kwargs):
+        self.__connect_data = kwargs
+        self.connection = None
+
+    def db_connect(self):
+        '''
+        Connect to DB
+        '''
+        self.connection = psycopg2.connect(**self.__connect_data)
+        return self.connection
+
+    def db_disconnect(self):
+        '''
+        Disconnect with DB
+        '''
+        if not self.connection.closed:
+            return
+        self.connection.close()
+        return bool(self.connection.closed)
+
+    def message_logger(self, message):
+        with self.connection.cursor() as cursor1:
+            reply_to = None
+            try:
+                reply_to = message.reply_to_message.message_id
+            except AttributeError:
+                pass
+            cursor1.execute('''
+            INSERT INTO botdata.messages (chat_id, user_id, message_id, time_stamp, text, reply_to) 
+            VALUES (%s, %s, %s, %s, %s, %s) 
+            ''', (message.chat.id, message.from_user.id, message.message_id, message.date,\
+                  message.text, reply_to))
+            self.connection.commit()
+        return cursor1.statusmessage
+
+
+
 
 
 
@@ -82,14 +115,22 @@ notmyiddict = {'first_name':'Vasya',
 
 dict2 = {'abc':342, 'dasf':'ddddeeet', 3424:'jjjeeeej'}
 
-dict_list = {'a':req_dict, 'b':dict2}
+#---------end---------
+userid = 7
+increment = 1
 
-# file = open('word_dict.txt', 'w')
-# # json.dump(dict_list, file)
-# # file.close()
-#
-# # with open('word_dict.txt', 'r') as file:
-# #     dict_list = json.load(file)
-# # dict1 = dict_list[0]
-# # dict2 = dict_list[1]
-# # print(dict1, dict2)
+botdata = SqlData(dbname=postgresql_bd, user=postgresql_username,
+                        password=postgresql_password, host=postgresql_host)
+conn = botdata.db_connect()
+cursor = conn.cursor()
+
+#test request
+cursor.execute('SELECT step, user_id FROM botdata.users where user_id=%s', (str(userid)))
+temp = cursor.fetchone()
+print('RAW STRING: ', temp)
+# conn.commit()
+cursor.close()
+print ('close connection = ', botdata.db_disconnect())
+
+#bd chat_id, user_id, message_id, date, text, reply_to_message_id
+
