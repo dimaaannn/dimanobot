@@ -4,7 +4,7 @@
 from bottoken import *
 import re
 from bot_func import *
-
+import dimanobot.roll
 
 bot.set_update_listener(listener) #регистрация вывода в консоль
 gif_search_dict = {} #словарь запросов гифок
@@ -128,6 +128,13 @@ def send_gif(message):
 @bot.message_handler(func=lambda m: m.text == 'hello')
 def reply_hello(message):
 	bot.reply_to(message, message.text)
+
+# roll dice
+@bot.message_handler(regexp=dimanobot.roll.Dice.roll_pattern)
+def roll(message):
+    roll_answer = str(message.from_user.username) + ' делает бросок на\n'
+    roll_answer += dimanobot.roll.dice.roll(message.text)
+    bot.send_message(message.chat.id, roll_answer, reply_to_message_id=message.message_id)
 
 
 #ответы лично мне, если начинаются с ~
