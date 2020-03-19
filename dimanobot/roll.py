@@ -22,12 +22,21 @@ class Dice:
     def roll(self, text: str):
         search = re.match(self.roll_pattern, text)
         if search:
-            if search.group(1) and search.group(1) != '0':
+            if search.group(1) and int(search.group(1)) > 1:
                 dice = int(search.group(1))
             else: dice = self.faces
             clear_text = str(search.group(2))
-            val = random.randint(1, dice)
-            return str(clear_text + '\nШанс успеха: ' + str(val) + ' из ' + str(dice))
+            if dice > 2:
+                val = random.randint(1, dice)
+                string = str(clear_text + '\nШанс успеха: ' + '*' + str(val) + ' из ' + str(dice) + '*')
+            else:
+                val = random.choices(
+                    population=['Успех', 'Неудача', 'Критический успех', 'Критическая неудача'],
+                    weights=[0.45, 0.45, 0.05, 0.05],
+                    k=1
+                )
+                string = str(clear_text + '\n' + '*' + str(*val) + '*')
+            return string
 
     @staticmethod
     def drop(faces=faces):

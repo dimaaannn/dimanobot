@@ -138,7 +138,7 @@ def send_gif(message):
 def roll(message):
     roll_answer = str(message.from_user.username) + ' делает бросок на\n'
     roll_answer += dimanobot.roll.dice.roll(message.text)
-    bot.send_message(message.chat.id, roll_answer)
+    bot.send_message(message.chat.id, roll_answer, parse_mode="Markdown")
 
 
 #ответы лично мне, если начинаются с ~
