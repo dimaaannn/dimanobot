@@ -70,17 +70,25 @@ def get_sticker_id(message):
             (set_name, emoji, file_size, sticker_id))
     else: ask_sticker_reply(message)
 
+
 @bot.message_handler(commands=['test'])
 def test_reply(message):
+    # *bold text*  _italic text_  [text](URL) parse_mode="Markdown"
     reply = None
     if message.reply_to_message:
         reply = message.reply_to_message.message_id
     temp = list ([message.chat.id, message.from_user.id, message.message_id, message.date,\
                   message.text, reply])
-    print('reply :', temp)
+    # print('reply :', temp) #reply info
+    text = 'some rand text *bold* _italic_\n'
+    text += '[text_mention](tg://user?id={})'.format(myid)
+    bot.send_message(message.chat.id, text, parse_mode="Markdown")
+
 
 # ОТВЕТ НА ВСЕ ТЫЧКИ текстом
-@bot.message_handler(func= lambda message: not message.reply_to_message == None and message.reply_to_message.from_user.id == bot_id)
+@bot.message_handler(func= lambda message: not message.reply_to_message == None \
+                                           and message.reply_to_message.from_user.id == bot_id)
+# not reply to msg нужна чтобы не выдал ошибку при обращении ко второй части
 def bot_reply(message):
     print(message)
     bot.reply_to(message, 'Ты докопаться решил?!!')
@@ -124,17 +132,13 @@ def send_gif(message):
             bot.send_animation(message.chat.id, gif)
     gif_2_hdd.save() #сохранить результат на HDD
 
-# Если lambda возвращает True - запускается функция
-@bot.message_handler(func=lambda m: m.text == 'hello')
-def reply_hello(message):
-	bot.reply_to(message, message.text)
 
 # roll dice
 @bot.message_handler(regexp=dimanobot.roll.Dice.roll_pattern)
 def roll(message):
     roll_answer = str(message.from_user.username) + ' делает бросок на\n'
     roll_answer += dimanobot.roll.dice.roll(message.text)
-    bot.send_message(message.chat.id, roll_answer, reply_to_message_id=message.message_id)
+    bot.send_message(message.chat.id, roll_answer)
 
 
 #ответы лично мне, если начинаются с ~
