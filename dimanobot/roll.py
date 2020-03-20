@@ -9,7 +9,7 @@ import re
 
 
 class Dice:
-    roll_pattern = r'(?i)^(?:roll|кубик|бросок(?: на)?) ?(\d{0,3}) (\.*)'  # FIXME change \. to \X
+    roll_pattern = r'(?i)^(?:roll|кубик|бросок(?: на)?) ?(\d{0,3}) (.*)'  # FIXME change \. to \X
     faces = 20  # количество граней у кубика
 
     def check_roll(self, text: str):

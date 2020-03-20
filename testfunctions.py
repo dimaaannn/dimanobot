@@ -50,45 +50,6 @@ class BotUser:
                 self.dict_of_users[id][key] = var
 
 
-class SqlData:
-    def __init__(self, **kwargs):
-        self.__connect_data = kwargs
-        self.connection = None
-
-    def db_connect(self):
-        '''
-        Connect to DB
-        '''
-        self.connection = psycopg2.connect(**self.__connect_data)
-        return self.connection
-
-    def db_disconnect(self):
-        '''
-        Disconnect with DB
-        '''
-        if not self.connection.closed:
-            return
-        self.connection.close()
-        return bool(self.connection.closed)
-
-    def message_logger(self, message):
-        with self.connection.cursor() as cursor1:
-            reply_to = None
-            try:
-                reply_to = message.reply_to_message.message_id
-            except AttributeError:
-                pass
-            cursor1.execute('''
-            INSERT INTO botdata.messages (chat_id, user_id, message_id, time_stamp, text, reply_to) 
-            VALUES (%s, %s, %s, %s, %s, %s) 
-            ''', (message.chat.id, message.from_user.id, message.message_id, message.date,\
-                  message.text, reply_to))
-            self.connection.commit()
-        return cursor1.statusmessage
-
-
-
-
 
 
 
