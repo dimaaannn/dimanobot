@@ -4,7 +4,6 @@ from telebot import types
 from bottoken import *
 from requests import get #for GifSearch
 import json              #for GifSearch
-# from testfunctions import SqlData
 import dimanobot.sql
 
 #основная функция бота!
@@ -21,6 +20,7 @@ def dolphinospam(gifsearch, chatid):
     for gif in gifs:
         bot.send_animation(chatid, gif)
 
+# create SQL instance
 botdata = dimanobot.sql.SqlData(dbname=postgresql_bd, user=postgresql_username,
                         password=postgresql_password, host=postgresql_host)
 #вывод сообщений в консоль

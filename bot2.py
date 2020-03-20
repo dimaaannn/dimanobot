@@ -113,20 +113,10 @@ def text_answers(message):
 
 #поиск гифок по запросу (до 9шт
 # gifsearch = GifSearch(gif_search_dict) #создать общий класс (пока что)
-@bot.message_handler(regexp=r'^(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$')  # gif <1_digit> <word> <word_optional>
+@bot.message_handler(regexp=dimanobot.gif.GifSearch.re_query)  # gif <1_digit> <word> <word_optional>
 def send_gif(message):
-    pattern = r'(?i)gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$'
-    search = re.match(pattern, message.text)
-    wordlist = []
-    word = str(search.group(2))
-    count = int(search.group(1))
-    if count <= 0:
-        return
-    wordlist = [str(search.group(3)), str(search.group(4))]
-    for pos in wordlist:
-        if pos: word += ' ' + pos
-    gifs = gifsearch.search_gif_tenor(count, word)
-    # print (gifs)
+    gifs = gifsearch.request(message.text)
+
     if gifs == None:
         bot.send_message(message.message_id, '"{}"\n Is not found. Sorry...'.format(word))
     else:

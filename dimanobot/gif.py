@@ -1,11 +1,13 @@
 from requests import get  # for GifSearch
 import json  # for GifSearch
+import re
 
 
 # GifSearch.GIFAPI_TENOR = GIFAPI  # Указать ключ api
 
 class GifSearch:
     GIFAPI_TENOR = str  # задать ключ АПИ
+    re_query = r'(?i)^gif (\d) (\w+)(?: |-|:)?(\w*)(?: |-|:)?(\w*)$'
 
     def __init__(self, gif_search_dict: dict):
         """
@@ -59,3 +61,16 @@ class GifSearch:
             search_result = None
             self.set_pos(search_request, 0)
         return search_result
+
+    def request(self, text):
+        search = re.match(self.re_query, text)  # разбираем строку поиска
+        wordlist = []
+        word = str(search.group(2))
+        count = int(search.group(1))
+        if count <= 0:
+            return
+        wordlist = [str(search.group(3)), str(search.group(4))]
+        for pos in wordlist:
+            if pos: word += ' ' + pos
+        return self.search_gif_tenor(count, word)
+
