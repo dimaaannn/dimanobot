@@ -45,4 +45,3 @@ class SqlData:
                   str(message.date), str(message.text), str(reply_to)))
             self.connection.commit()
         return cursor1.statusmessage
-

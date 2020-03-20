@@ -5,11 +5,13 @@ from bottoken import *
 import re
 from bot_func import *
 import dimanobot.roll
+import dimanobot.gif
+
 
 bot.set_update_listener(listener) #регистрация вывода в консоль
 gif_search_dict = {} #словарь запросов гифок
-gifsearch = GifSearch(gif_search_dict) #имя экземпляра для поиска гифок
-GifSearch.GIFAPI_TENOR = GIFAPI #нужно для класса гифок
+gifsearch = dimanobot.gif.GifSearch(gif_search_dict) #имя экземпляра для поиска гифок
+dimanobot.gif.GifSearch.GIFAPI_TENOR = GIFAPI #нужно для класса гифок
 gif_2_hdd = DataSaver('botdata', gif_search_dict=gif_search_dict)
 print ('gif dictionary loaded is {}'.format(gif_2_hdd.load()))
 
