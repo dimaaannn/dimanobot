@@ -79,8 +79,12 @@ def deathlist(message):
     botdata.db_connect()
     if message.reply_to_message:
         added = messager.user_to_deathlist(message)
-        if added:
+        print(added)
+        if added == 'INSERT 0 1':
             text = str('User {} added to deathlist'.format(message.reply_to_message.from_user.first_name))
+            bot.send_message(message.chat.id, text)
+        else:
+            text = str('User {} alredy in your deathlist'.format(message.reply_to_message.from_user.first_name))
             bot.send_message(message.chat.id, text)
     else:
         text = messager.deathlist(message.chat.id)

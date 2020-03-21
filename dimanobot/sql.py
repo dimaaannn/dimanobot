@@ -108,6 +108,7 @@ class SqlData:
                                 decl_user_id, decl_first_name, decl_last_name, decl_username)
                                     VALUES  (%s, %s, %s, %s, %s,
                                     %s, %s, %s, %s)
+                                ON CONFLICT DO NOTHING
             ''', (str(chatid), str(data['user_id']), str(data['first_name']), str(data['last_name']),
                   str(data['username']),
                   str(data['decl_user_id']), str(data['decl_first_name']),
