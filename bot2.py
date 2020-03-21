@@ -6,7 +6,9 @@ import re
 from bot_func import *
 import dimanobot.roll
 import dimanobot.gif
+import dimanobot.msg
 
+test = dimanobot.msg.Messager(bot)
 
 bot.set_update_listener(listener) #регистрация вывода в консоль
 gif_search_dict = {} #словарь запросов гифок
@@ -72,7 +74,7 @@ def get_sticker_id(message):
             (set_name, emoji, file_size, sticker_id))
     else: ask_sticker_reply(message)
 
-
+#  TESTING
 @bot.message_handler(commands=['test'])
 def test_reply(message):
     # *bold text*  _italic text_  [text](URL) parse_mode="Markdown"
@@ -85,6 +87,8 @@ def test_reply(message):
     text = 'some rand text *bold* _italic_\n'
     text += '[text_mention](tg://user?id={})'.format(myid)
     bot.send_message(message.chat.id, text, parse_mode="Markdown")
+    test.parser(message, 3)
+
 
 
 # ОТВЕТ НА ВСЕ ТЫЧКИ текстом
