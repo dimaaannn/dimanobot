@@ -83,7 +83,9 @@ def deathlist(message):
             text = str('User {} added to deathlist'.format(message.reply_to_message.from_user.first_name))
             bot.send_message(message.chat.id, text)
     else:
-        bot.send_message(message.chat.id, messager.deathlist(message.chat.id), parse_mode="Markdown")
+        text = messager.deathlist(message.chat.id)
+        text += '\nЧтобы добавить хуманса в список, ответь командой /deathlist на его сообщение'
+        bot.send_message(message.chat.id, text, parse_mode="Markdown")
 
 #  TESTING
 @bot.message_handler(commands=['test'])
