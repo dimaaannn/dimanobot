@@ -38,7 +38,8 @@ class Messager:
         raw_list = self.sql.get_deathlist(chat_id)
         print('deathlist raw: ', raw_list)
         string = 'Deathlist score:\n\n'
-
+        if raw_list is None:
+            return 'Deathlist is empty'
         for i, row in enumerate(raw_list):
             print('2 stage row: ', raw_list[i])
             string += '*{}:* {}\nHaters: {}\n'.format(raw_list[i]['score'], raw_list[i]['first_name'], raw_list[i]['decl_first_name'])
