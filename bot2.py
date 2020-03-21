@@ -8,7 +8,7 @@ import dimanobot.roll
 import dimanobot.gif
 import dimanobot.msg
 
-test = dimanobot.msg.Messager(bot)
+messager = dimanobot.msg.Messager(bot, botdata)
 
 bot.set_update_listener(listener) #регистрация вывода в консоль
 gif_search_dict = {} #словарь запросов гифок
@@ -74,6 +74,17 @@ def get_sticker_id(message):
             (set_name, emoji, file_size, sticker_id))
     else: ask_sticker_reply(message)
 
+@bot.message_handler(commands=['deathlist'])
+def deathlist(message):
+    botdata.db_connect()
+    if message.reply_to_message:
+        added = messager.user_to_deathlist(message)
+        if added:
+            text = str('User {} added to deathlist'.format(message.reply_to_message.from_user.first_name))
+            bot.send_message(message.chat.id, text)
+    else:
+        bot.send_message(message.chat.id, messager.deathlist(message.chat.id), parse_mode="Markdown")
+
 #  TESTING
 @bot.message_handler(commands=['test'])
 def test_reply(message):
@@ -87,7 +98,7 @@ def test_reply(message):
     text = 'some rand text *bold* _italic_\n'
     text += '[text_mention](tg://user?id={})'.format(myid)
     bot.send_message(message.chat.id, text, parse_mode="Markdown")
-    test.parser(message, 3)
+    messager.parser(message, 3)
 
 
 

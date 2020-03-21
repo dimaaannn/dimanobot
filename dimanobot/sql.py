@@ -117,11 +117,11 @@ class SqlData:
         return cursor4.statusmessage
 
     def get_deathlist(self, chat_id):
-        with self.connection.cursor() as cursor5:
+        with self.connection.cursor() as cursor5:  # FIXME дубликаты имени добавителей
             cursor5.execute('''
                 SELECT count(user_id),
                 first_name || ', ' || last_name AS first_name, 
-                string_agg(decl_username || ' ' || decl_last_name, ', ') AS decl_nickname,
+                string_agg(decl_first_name || ' ' || decl_last_name, ', ') AS decl_nickname,
                 string_agg(decl_user_id, ', ') AS decl_id
                     FROM botdata.deathlist
                     WHERE chat_id = '%s'
@@ -130,7 +130,7 @@ class SqlData:
             ''' % str(chat_id)
                             )
 
-            names = {0: 'Score',
+            names = {0: 'score',
                      1: 'first_name',
                      2: 'decl_first_name',
                      3: 'decl_user_id'}
@@ -165,6 +165,6 @@ if __name__ == '__main__':
     # print(sqldb.update_user(user_id='555', first_name='Petya', last_name='Volodin', username='Volodyaaa'))
     # i = sqldb.user('555')
     # i = sqldb.add_deathlist(33333, **data)
-    i = sqldb.get_deathlist(33333)
+    i = sqldb.get_deathlist(161613125)
     print(i)
     sqldb.db_disconnect()
