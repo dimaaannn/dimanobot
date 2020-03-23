@@ -116,6 +116,16 @@ def bot_reply(message):
     print(message)
     bot.reply_to(message, 'Ты докопаться решил?!!')
 
+# F- Function
+@bot.message_handler(func= messager.f_detector)
+def send_f(message):
+    # Стикеры отправляются из функции f_detector (костыль)
+    f_sticker = 'CAACAgIAAxkBAAII0F55JXavA7Y2W63eIHcXV4bSYRAEAAImAQACTptkAqTiIzqwhw-vGAQ'
+    bot.send_chat_action(message.chat.id, 'typing')
+    time.sleep(3)
+    bot.send_sticker(message.chat.id, f_sticker)
+
+
 # echo
 @bot.message_handler(regexp=r'(?i)echo (.*)')  # потом упростить
 def text_answers(message):

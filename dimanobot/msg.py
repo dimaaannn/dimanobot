@@ -1,10 +1,12 @@
 from bot_func import bot
+import time
 from telebot import types
 
 class Messager:
     def __init__(self, bot_instance, sql_instance):
         self.bot = bot_instance
         self.sql = sql_instance
+
 
     def test(self, chatid, text):
         self.bot.send_message(chatid, text)
@@ -46,4 +48,19 @@ class Messager:
         print('deathlist string: ', string)
         return string
 
+    def f_detector(self, message):
+        f_sticker = 'CAACAgIAAxkBAAII0F55JXavA7Y2W63eIHcXV4bSYRAEAAImAQACTptkAqTiIzqwhw-vGAQ'
+        f_pack = 'FforRespect'
+        if message.content_type == 'sticker':
+            sticker_pack_name = message.sticker.set_name
+            if sticker_pack_name == f_pack:
+                bot.send_chat_action(message.chat.id, 'typing')
+                time.sleep(3)
+                bot.send_sticker(message.chat.id, f_sticker)  # КОСТЫЛЬ, сообщение не передаётся в функцию
+                return True
+        elif message.content_type == 'text':
+            if str(message.text).lower() == 'f':
+                return True
+        else:
+            return False
 
