@@ -87,7 +87,7 @@ class Messager:
             if self.f_data[chat_id]['msglist'][0] == int(message_id) - 1:  # If previous message F
                 self.f_data[chat_id]['msglist'].insert(0, message_id)
                 f_list = len(self.f_data[chat_id]['msglist'])
-                print('Combo F size {}'.format(f_list))
+                # print('Combo F size {}'.format(f_list))
                 if f_list >= 2:  # if X previous message is F
                     self.f_data[chat_id]['msglist'].clear()
                     self.f_data[chat_id]['msglist'].insert(0, message_id)
@@ -110,7 +110,7 @@ class Messager:
         except (KeyError, IndexError):  # If writes is not exist, create new write
             self.f_data[chat_id] = {'msglist': []}
             self.f_data[chat_id]['msglist'].insert(0, int(message_id))
-            print('f created')
+            # print('f created')
             check = randint(1, 10)
             if check >= 8:
                 return True

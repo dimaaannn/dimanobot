@@ -119,7 +119,6 @@ def bot_reply(message):
 @bot.message_handler(func= messager.f_detector)
 def send_f(message):
     # Стикеры отправляются из функции f_detector (костыль)
-    f_sticker = 'CAACAgIAAxkBAAII0F55JXavA7Y2W63eIHcXV4bSYRAEAAImAQACTptkAqTiIzqwhw-vGAQ'
     bot.send_chat_action(message.chat.id, 'typing')
     time.sleep(3)
     bot.send_sticker(message.chat.id, messager.f_selecter())
@@ -146,9 +145,10 @@ def text_answers(message):
 @bot.message_handler(regexp=dimanobot.gif.GifSearch.re_query)  # gif <1_digit> <word> <word_optional>
 def send_gif(message):
     gifs = gifsearch.request(message.text)
+    print(gifs)
 
     if gifs == None:
-        bot.send_message(message.message_id, '"{}"\n Is not found. Sorry...'.format(word))
+        bot.send_message(message.chat.id, 'Gif not found. Sorry...')
     else:
         for gif in gifs:
             bot.send_animation(message.chat.id, gif)
