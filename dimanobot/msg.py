@@ -2,8 +2,13 @@ from bot_func import bot
 import time
 from random import randint
 from random import choice
-
+from dimanobot.sticker_list import *
 from telebot import types
+
+f_sticker_list = [
+    'CAACAgIAAxkBAAII0F55JXavA7Y2W63eIHcXV4bSYRAEAAImAQACTptkAqTiIzqwhw-vGAQ',  # Cat
+
+]
 
 
 class Messager:
@@ -13,12 +18,10 @@ class Messager:
         self.sql = sql_instance
         self.f_data = {}
 
-
-
     def test(self, chatid, text):
         self.bot.send_message(chatid, text)
 
-    def parser(self, message, count):
+    def parser(self, message, count):  # TODO Test function
         chat = message.chat.id
         message_id = message.message_id
         self.bot.send_message(chat, message_id)
@@ -51,7 +54,8 @@ class Messager:
             return 'Deathlist is empty'
         for i, row in enumerate(raw_list):
             print('2 stage row: ', raw_list[i])
-            string += '*{}:* {}\nHaters: {}\n'.format(raw_list[i]['score'], raw_list[i]['first_name'], raw_list[i]['decl_first_name'])
+            string += '*{}:* {}\nHaters: {}\n'.format(raw_list[i]['score'], raw_list[i]['first_name'],
+                                                      raw_list[i]['decl_first_name'])
         print('deathlist string: ', string)
         return string
 
@@ -65,7 +69,7 @@ class Messager:
                 if result:
                     bot.send_chat_action(message.chat.id, 'typing')
                     time.sleep(3)
-                    bot.send_sticker(message.chat.id, f_sticker)  # КОСТЫЛЬ, сообщение не передаётся в функцию
+                    bot.send_sticker(message.chat.id, self.f_selecter())  # КОСТЫЛЬ, сообщение не передаётся в функцию
                 return True
         elif message.content_type == 'text':
             if str(message.text).lower() == 'f':
@@ -93,7 +97,7 @@ class Messager:
                 print('Short F detected')
                 self.f_data[chat_id]['msglist'].clear()
                 self.f_data[chat_id]['msglist'].insert(0, int(message_id))
-                check = randint(1,10)
+                check = randint(1, 10)
                 if check >= 8:  # random send F
                     return True
                 else:
@@ -113,8 +117,5 @@ class Messager:
             else:
                 return False
 
-    def f_selecter(self, list):
-        return choice(list)
-
-
-
+    def f_selecter(self):
+        return choice(f_sticker_set)

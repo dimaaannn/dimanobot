@@ -97,9 +97,8 @@ def test_reply(message):
     # *bold text*  _italic text_  [text](URL) parse_mode="Markdown"
     reply = None
     if message.reply_to_message:
-        reply = message.reply_to_message.message_id
-    temp = list ([message.chat.id, message.from_user.id, message.message_id, message.date,\
-                  message.text, reply])
+        reply = message.reply_to_message
+
     # print('reply :', temp) #reply info
     text = 'some rand text *bold* _italic_\n'
     text += '[text_mention](tg://user?id={})'.format(myid)
@@ -116,14 +115,14 @@ def bot_reply(message):
     print(message)
     bot.reply_to(message, 'Ты докопаться решил?!!')
 
-# F- Function
+# F- Sender
 @bot.message_handler(func= messager.f_detector)
 def send_f(message):
     # Стикеры отправляются из функции f_detector (костыль)
     f_sticker = 'CAACAgIAAxkBAAII0F55JXavA7Y2W63eIHcXV4bSYRAEAAImAQACTptkAqTiIzqwhw-vGAQ'
     bot.send_chat_action(message.chat.id, 'typing')
     time.sleep(3)
-    bot.send_sticker(message.chat.id, f_sticker)
+    bot.send_sticker(message.chat.id, messager.f_selecter())
 
 
 # echo
