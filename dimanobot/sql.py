@@ -118,7 +118,7 @@ class SqlData:
         return cursor4.statusmessage
 
     def get_deathlist(self, chat_id):
-        with self.connection.cursor() as cursor5:  # FIXME дубликаты имени добавителей
+        with self.connection.cursor() as cursor5:
             cursor5.execute('''
                 SELECT count(user_id),
                 first_name || ', ' || last_name AS first_name, 
